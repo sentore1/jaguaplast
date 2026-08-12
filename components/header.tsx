@@ -1,11 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, X, Search, ArrowRight } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, Search, ArrowRight, Home, Info, Cpu, Package, Phone, Image as ImageIcon, Factory, TrendingUp, Lock } from "lucide-react";
 import { GetQuoteModal } from "@/components/get-quote-modal";
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
+
+const searchItems = [
+  { label: "Home", href: "/", icon: Home, group: "Pages" },
+  { label: "About Us", href: "/about", icon: Info, group: "Pages" },
+  { label: "Solutions / Technology", href: "/technology", icon: Cpu, group: "Pages" },
+  { label: "Products", href: "/products", icon: Package, group: "Pages" },
+  { label: "Contact Us", href: "/contact", icon: Phone, group: "Pages" },
+  { label: "Gallery", href: "/gallery", icon: ImageIcon, group: "Pages" },
+  { label: "Manufacturer", href: "/manufacturer", icon: Factory, group: "Pages" },
+  { label: "Investor Relations", href: "/investor-relations", icon: TrendingUp, group: "Pages" },
+  { label: "Privacy Policy", href: "/privacy", icon: Lock, group: "Pages" },
+];
 
 const navLinks = [
   { label: "HOME", href: "/" },
@@ -18,8 +38,22 @@ const navLinks = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const isHome = pathname === "/" || pathname === "/gallery";
+
+  // Open search with Ctrl+K / Cmd+K
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSearchOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   return (
     <>
@@ -39,8 +73,8 @@ export function Header() {
             />
           </Link>
 
-          {/* Nav — centered, takes all available space */}
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
+          {/* Nav — bottom-aligned, takes all available space */}
+          <nav className="hidden md:flex flex-1 items-end justify-center gap-6 pb-4">
             {navLinks.map((link) => {
               const isActive =
                 link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -59,17 +93,6 @@ export function Header() {
               );
             })}
           </nav>
-
-          {/* Search icon */}
-          <div className="hidden md:flex items-center px-5">
-            <button
-              type="button"
-              aria-label="Search"
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              <Search size={17} />
-            </button>
-          </div>
 
           {/* GET A QUOTE — opens modal, flush right edge, fills full height */}
           <button
@@ -137,6 +160,32 @@ export function Header() {
 
       {/* Quote Modal — rendered outside header so it overlays everything */}
       <GetQuoteModal isOpen={isQuoteOpen} onClose={() => setIsQuoteOpen(false)} />
+
+      {/* Search Command Palette */}
+      <CommandDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} title="Search" description="Search pages and content">
+        <CommandInput placeholder="Search pages…" />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Pages">
+            {searchItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <CommandItem
+                  key={item.href}
+                  value={item.label}
+                  onSelect={() => {
+                    setIsSearchOpen(false);
+                    router.push(item.href);
+                  }}
+                >
+                  <Icon className="mr-2 size-4 opacity-60" />
+                  {item.label}
+                </CommandItem>
+              );
+            })}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </>
   );
 }
