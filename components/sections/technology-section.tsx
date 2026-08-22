@@ -2,6 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import type { GalleryImage } from "@/lib/types/cms";
+
+const FALLBACK_TECH_IMAGES: GalleryImage[] = [
+  { id: 1, src: "/edited/IMG_3168.png", alt: "Luxury footwear manufacturing showcase", wide: false, context: "homepage_technology", position: "center", sort_order: 1, active: true },
+  { id: 2, src: "/image4/1.png",  alt: "Product image 1", wide: false, context: "homepage_technology", position: "left",   sort_order: 2, active: true },
+  { id: 3, src: "/image4/3.png",  alt: "Product image 3", wide: false, context: "homepage_technology", position: "left",   sort_order: 3, active: true },
+  { id: 4, src: "/image5/11.png", alt: "Product image 7", wide: false, context: "homepage_technology", position: "right",  sort_order: 4, active: true },
+  { id: 5, src: "/image5/8.png",  alt: "Product image 8", wide: false, context: "homepage_technology", position: "right",  sort_order: 5, active: true },
+];
 
 function ScrollRevealText({ text }: { text: string }) {
   const containerRef = useRef<HTMLParagraphElement>(null);
@@ -58,34 +67,14 @@ function ScrollRevealText({ text }: { text: string }) {
   );
 }
 
-const sideImages = [
-  {
-    src: "/image4/1.png",
-    alt: "Product image 1",
-    position: "left",
-    span: 1,
-  },
-  {
-    src: "/image4/3.png",
-    alt: "Product image 3",
-    position: "left",
-    span: 1,
-  },
-  {
-    src: "/image5/11.png",
-    alt: "Product image 7",
-    position: "right",
-    span: 1,
-  },
-  {
-    src: "/image5/8.png",
-    alt: "Product image 8",
-    position: "right",
-    span: 1,
-  },
-];
+interface TechnologySectionProps {
+  images?: GalleryImage[];
+}
 
-export function TechnologySection() {
+export function TechnologySection({ images }: TechnologySectionProps) {
+  const allImages = images && images.length > 0 ? images : FALLBACK_TECH_IMAGES;
+  const centerImage = allImages.find((img) => img.position === "center") ?? allImages[0];
+  const sideImages = allImages.filter((img) => img.position !== "center");
   const sectionRef = useRef<HTMLElement>(null);
   const textSectionRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -170,10 +159,10 @@ export function TechnologySection() {
             >
               {sideImages.filter(img => img.position === "left").map((img, idx) => (
                 <div 
-                  key={idx} 
+                  key={img.id ?? idx} 
                   className="relative overflow-hidden will-change-transform"
                   style={{
-                    flex: img.span,
+                    flex: 1,
                     borderRadius: `${borderRadius}px`,
                   }}
                 >
@@ -198,8 +187,8 @@ export function TechnologySection() {
               }}
             >
               <Image
-                src="/image5/12.png"
-                alt="Luxury footwear manufacturing showcase"
+                src={centerImage.src || "/placeholder.svg"}
+                alt={centerImage.alt}
                 fill
                 className="object-cover"
               />
@@ -250,10 +239,10 @@ export function TechnologySection() {
             >
               {sideImages.filter(img => img.position === "right").map((img, idx) => (
                 <div 
-                  key={idx} 
+                  key={img.id ?? idx} 
                   className="relative overflow-hidden will-change-transform"
                   style={{
-                    flex: img.span,
+                    flex: 1,
                     borderRadius: `${borderRadius}px`,
                   }}
                 >
