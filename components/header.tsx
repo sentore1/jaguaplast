@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Search, ArrowRight, Home, Info, Cpu, Package, Phone, Image as ImageIcon, Factory, TrendingUp, Lock } from "lucide-react";
+import { Menu, X, ArrowRight, Home, Info, Cpu, Package, Phone, Image as ImageIcon, Factory, TrendingUp, Lock } from "lucide-react";
 import { GetQuoteModal } from "@/components/get-quote-modal";
 import {
   CommandDialog,
@@ -14,28 +14,37 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
+import type { NavLink } from "@/lib/types/cms";
 
 const searchItems = [
-  { label: "Home", href: "/", icon: Home, group: "Pages" },
-  { label: "About Us", href: "/about", icon: Info, group: "Pages" },
-  { label: "Solutions / Technology", href: "/technology", icon: Cpu, group: "Pages" },
-  { label: "Products", href: "/products", icon: Package, group: "Pages" },
-  { label: "Contact Us", href: "/contact", icon: Phone, group: "Pages" },
-  { label: "Gallery", href: "/gallery", icon: ImageIcon, group: "Pages" },
-  { label: "Manufacturer", href: "/manufacturer", icon: Factory, group: "Pages" },
-  { label: "Investor Relations", href: "/investor-relations", icon: TrendingUp, group: "Pages" },
-  { label: "Privacy Policy", href: "/privacy", icon: Lock, group: "Pages" },
+  { label: "Home", href: "/", icon: Home },
+  { label: "About Us", href: "/about", icon: Info },
+  { label: "Solutions / Technology", href: "/technology", icon: Cpu },
+  { label: "Products", href: "/products", icon: Package },
+  { label: "Contact Us", href: "/contact", icon: Phone },
+  { label: "Gallery", href: "/gallery", icon: ImageIcon },
+  { label: "Manufacturer", href: "/manufacturer", icon: Factory },
+  { label: "Investor Relations", href: "/investor-relations", icon: TrendingUp },
+  { label: "Privacy Policy", href: "/privacy", icon: Lock },
 ];
 
-const navLinks = [
-  { label: "HOME", href: "/" },
-  { label: "ABOUT", href: "/about" },
-  { label: "SOLUTIONS", href: "/technology" },
-  { label: "PRODUCTS", href: "/products" },
-  { label: "CONTACT US", href: "/contact" },
+// Fallback nav links used if Supabase is unavailable
+const fallbackNavLinks = [
+  { id: 1, label: "HOME", href: "/", sort_order: 1, active: true },
+  { id: 2, label: "ABOUT", href: "/about", sort_order: 2, active: true },
+  { id: 3, label: "SOLUTIONS", href: "/technology", sort_order: 3, active: true },
+  { id: 4, label: "PRODUCTS", href: "/products", sort_order: 4, active: true },
+  { id: 5, label: "CONTACT US", href: "/contact", sort_order: 5, active: true },
 ];
 
-export function Header() {
+interface HeaderProps {
+  navLinks?: NavLink[];
+}
+
+export function Header({ navLinks: navLinksProp }: HeaderProps) {
+  const navLinks = (navLinksProp && navLinksProp.length > 0 ? navLinksProp : fallbackNavLinks)
+    .filter((l) => l.active)
+    .sort((a, b) => a.sort_order - b.sort_order);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);

@@ -4,6 +4,7 @@ import { Header } from "@/components/header";
 import { PhilosophySection } from "@/components/sections/philosophy-section";
 import { FeaturedProductsSection } from "@/components/sections/featured-products-section";
 import { FooterSection } from "@/components/sections/footer-section";
+import { getFooterLinks, getSettings, getProducts } from "@/lib/cms";
 
 export const metadata = {
   title: "Products | JAGUAPLAST",
@@ -11,7 +12,8 @@ export const metadata = {
     "Explore Jaguaplast's full range of high-quality plastic shoe products — lightweight, durable, and engineered for every step.",
 };
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const [footerLinks, settings, products] = await Promise.all([getFooterLinks(), getSettings(), getProducts()]);
   return (
     <main className="min-h-screen bg-background">
       <Header />
@@ -51,10 +53,10 @@ export default function ProductsPage() {
       {/* Sections */}
       <div id="collection">
         <PhilosophySection />
-        <FeaturedProductsSection />
+        <FeaturedProductsSection products={products} />
       </div>
 
-      <FooterSection />
+      <FooterSection links={footerLinks} settings={settings} />
     </main>
   );
 }

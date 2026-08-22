@@ -3,15 +3,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { Stat } from "@/lib/types/cms";
 
-const stats = [
-  { value: "10+", label: "Years of Manufacturing" },
-  { value: "50+", label: "Active Partners" },
-  { value: "20M+", label: "Units / Year" },
-  { value: "15", label: "Countries Served" },
+const fallbackStats = [
+  { id: 1, value: "10+", label: "Years of Manufacturing", context: "manufacturer_hero", sort_order: 1 },
+  { id: 2, value: "50+", label: "Active Partners", context: "manufacturer_hero", sort_order: 2 },
+  { id: 3, value: "20M+", label: "Units / Year", context: "manufacturer_hero", sort_order: 3 },
+  { id: 4, value: "15", label: "Countries Served", context: "manufacturer_hero", sort_order: 4 },
 ];
 
-export function ManufacturerHero() {
+interface ManufacturerHeroProps {
+  stats?: Stat[];
+}
+
+export function ManufacturerHero({ stats: statsProp }: ManufacturerHeroProps) {
+  const rawStats = (statsProp && statsProp.length > 0 ? statsProp : fallbackStats)
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  // Deduplicate by label — keeps the first occurrence after sorting
+  const seen = new Set<string>();
+  const stats = rawStats.filter((s) => {
+    if (seen.has(s.label)) return false;
+    seen.add(s.label);
+    return true;
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -22,16 +37,16 @@ export function ManufacturerHero() {
     <section className="relative min-h-screen flex flex-col justify-end overflow-hidden bg-black">
       {/* Background image */}
       <Image
-        src="/other image/WhatsApp Image 2026-07-30 at 7.14.52 PM.jpeg"
+        src="/other image/mfg-7.jpg"
         alt="Jaguaplast manufacturing facility"
         fill
-        className="object-cover opacity-40"
+        className="object-cover opacity-55"
         priority
       />
 
       {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent" />
 
       {/* Top label */}
       <div
@@ -100,7 +115,7 @@ export function ManufacturerHero() {
         <div className="grid grid-cols-2 md:grid-cols-4">
           {stats.map((stat, i) => (
             <div
-              key={stat.label}
+              key={stat.id}
               className={`group px-6 py-8 md:px-10 ${
                 i < stats.length - 1 ? "border-r border-white/10" : ""
               }`}

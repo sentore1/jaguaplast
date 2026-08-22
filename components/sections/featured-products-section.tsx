@@ -1,41 +1,33 @@
 "use client";
 
 import { FadeImage } from "@/components/fade-image";
+import type { Product } from "@/lib/types/cms";
 
-const features = [
-  {
-    title: "Arch-Support Sole",
-    description: "Comfort",
-    image: "/image5/16.png",
-  },
-  {
-    title: "All-Season Durability",
-    description: "Resilience",
-    image: "/image5/7.png",
-  },
-  {
-    title: "Ergonomic Last Design",
-    description: "Fit",
-    image: "/image5/4.png",
-  },
-  {
-    title: "Cushioned Footbed",
-    description: "Comfort",
-    image: "/image5/11.png",
-  },
-  {
-    title: "Handstitched Finishing",
-    description: "Craftsmanship",
-    image: "/image5/6.png",
-  },
-  {
-    title: "Precision Engineering",
-    description: "Quality",
-    image: "/image5/13.png",
-  },
+interface FeaturedProductsSectionProps {
+  products: Product[];
+}
+
+const FALLBACK_PRODUCTS: Product[] = [
+  { id: 1, title: "Arch-Support Sole",      description: "Comfort",       image_src: "/image5/16.png",  sort_order: 1, active: true },
+  { id: 2, title: "All-Season Durability",  description: "Resilience",    image_src: "/image5/7.png",   sort_order: 2, active: true },
+  { id: 3, title: "Ergonomic Last Design",  description: "Fit",           image_src: "/image5/4.png",   sort_order: 3, active: true },
+  { id: 4, title: "Cushioned Footbed",      description: "Comfort",       image_src: "/image5/11.png",  sort_order: 4, active: true },
+  { id: 5, title: "Handstitched Finishing", description: "Craftsmanship", image_src: "/image5/6.png",   sort_order: 5, active: true },
+  { id: 6, title: "Precision Engineering",  description: "Quality",       image_src: "/image5/13.png",  sort_order: 6, active: true },
 ];
 
-export function FeaturedProductsSection() {
+export function FeaturedProductsSection({ products }: FeaturedProductsSectionProps) {
+  // Deduplicate by image_src to handle repeated DB seeds, then fall back to
+  // static list if nothing came back from the database.
+  const seen = new Set<string>();
+  const unique = products.filter((p) => {
+    if (seen.has(p.image_src)) return false;
+    seen.add(p.image_src);
+    return true;
+  });
+
+  const items = unique.length > 0 ? unique : FALLBACK_PRODUCTS;
+
   return (
     <section id="technology" className="bg-background">
       {/* Section Title */}
@@ -52,12 +44,12 @@ export function FeaturedProductsSection() {
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 gap-4 px-6 pb-20 md:grid-cols-3 md:px-12 lg:px-20">
-        {features.map((feature) => (
-          <div key={feature.title} className="group border border-border shadow-md overflow-hidden">
+        {items.map((product) => (
+          <div key={`${product.id}-${product.image_src}`} className="group border border-border shadow-md overflow-hidden">
             <div className="relative aspect-[4/3] overflow-hidden">
               <FadeImage
-                src={feature.image || "/placeholder.svg"}
-                alt={feature.title}
+                src={product.image_src || "/placeholder.svg"}
+                alt={product.title}
                 fill
                 className="object-cover group-hover:scale-105"
               />
@@ -66,10 +58,7 @@ export function FeaturedProductsSection() {
         ))}
       </div>
 
-      {/* CTA Link */}
-      <div className="flex justify-center px-6 pb-28 md:px-12 lg:px-20">
-        
-      </div>
+      <div className="flex justify-center px-6 pb-28 md:px-12 lg:px-20" />
     </section>
   );
 }

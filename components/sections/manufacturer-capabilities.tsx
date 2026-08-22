@@ -1,65 +1,25 @@
 "use client";
 
 import Image from "next/image";
+import type { ManufacturerCapability } from "@/lib/types/cms";
 
-const capabilities = [
-  {
-    title: "Injection Moulding",
-    description:
-      "High-precision injection moulding for complex geometries across a full range of thermoplastics and engineering polymers.",
-    specs: ["±0.01 mm tolerance", "Multi-cavity tooling", "500T – 3,200T clamp force"],
-    image: "/image4/1.png",
-    span: "col-span-1 md:col-span-2",
-    tall: true,
-  },
-  {
-    title: "Blow Moulding",
-    description:
-      "Extrusion and injection blow moulding for hollow forms — containers, ducts, and complex fluid-path components.",
-    specs: ["Up to 50L volume", "HDPE, PP, PET, PVC", "Custom wall thickness"],
-    image: "/image4/3.png",
-    span: "col-span-1",
-    tall: false,
-  },
-  {
-    title: "Thermoforming",
-    description:
-      "Vacuum and pressure thermoforming for large-area panels and enclosures with rapid, cost-effective tooling.",
-    specs: ["2400 × 1200 mm sheets", "ABS, PETG, Acrylic", "Tooling in 2 weeks"],
-    image: "/image4/6.png",
-    span: "col-span-1",
-    tall: false,
-  },
-  {
-    title: "CNC Finishing",
-    description:
-      "Post-mould CNC machining for precision holes, threads, and surface features beyond mould capability.",
-    specs: ["5-axis CNC centres", "ISO 2768 fine class", "Full GD&T reporting"],
-    image: "/image4/7.png",
-    span: "col-span-1",
-    tall: false,
-  },
-  {
-    title: "Assembly & Sub-Assembly",
-    description:
-      "In-house assembly lines with ultrasonic welding, heat staking, and mechanical fastening for multi-component products.",
-    specs: ["Ultrasonic welding", "Clean-room assembly", "Outbound QC audit"],
-    image: "/image4/8.png",
-    span: "col-span-1",
-    tall: false,
-  },
-  {
-    title: "Surface Treatment",
-    description:
-      "Pad printing, spray painting, UV coating, and laser engraving for branding and functional surface requirements.",
-    specs: ["Pantone colour matching", "UV & chemical resistance", "Laser engraving"],
-    image: "/image4/43.png",
-    span: "col-span-1 md:col-span-2",
-    tall: false,
-  },
+const FALLBACK: ManufacturerCapability[] = [
+  { id: 1, title: "Injection Moulding",     description: "High-precision injection moulding for complex geometries.", image_src: "/image4/1.png",  specs: ["±0.01 mm tolerance", "Multi-cavity tooling", "500T – 3,200T clamp force"], span_class: "col-span-1", is_tall: false, sort_order: 1 },
+  { id: 2, title: "Blow Moulding",          description: "Extrusion and injection blow moulding for hollow forms.", image_src: "/image4/3.png",  specs: ["Up to 50L volume", "HDPE, PP, PET, PVC", "Custom wall thickness"],           span_class: "col-span-1", is_tall: false, sort_order: 2 },
+  { id: 3, title: "Thermoforming",          description: "Vacuum and pressure thermoforming for large-area panels.", image_src: "/image4/6.png",  specs: ["2400 × 1200 mm sheets", "ABS, PETG, Acrylic", "Tooling in 2 weeks"],        span_class: "col-span-1", is_tall: false, sort_order: 3 },
+  { id: 4, title: "CNC Finishing",          description: "Post-mould CNC machining for precision features.", image_src: "/image4/7.png",  specs: ["5-axis CNC centres", "ISO 2768 fine class", "Full GD&T reporting"],           span_class: "col-span-1", is_tall: false, sort_order: 4 },
+  { id: 5, title: "Assembly & Sub-Assembly",description: "In-house assembly with ultrasonic welding and heat staking.", image_src: "/image4/8.png",  specs: ["Ultrasonic welding", "Clean-room assembly", "Outbound QC audit"],          span_class: "col-span-1", is_tall: false, sort_order: 5 },
+  { id: 6, title: "Surface Treatment",      description: "Pad printing, spray painting, UV coating, and laser engraving.", image_src: "/image4/43.png", specs: ["Pantone colour matching", "UV & chemical resistance", "Laser engraving"], span_class: "col-span-1", is_tall: false, sort_order: 6 },
 ];
 
-export function ManufacturerCapabilities() {
+interface ManufacturerCapabilitiesProps {
+  capabilities: ManufacturerCapability[];
+}
+
+export function ManufacturerCapabilities({ capabilities }: ManufacturerCapabilitiesProps) {
+  const items = capabilities.length > 0 ? capabilities : FALLBACK;
+  const sorted = [...items].sort((a, b) => a.sort_order - b.sort_order);
+
   return (
     <section id="capabilities" className="bg-background px-6 py-24 md:px-12 md:py-32 lg:px-20">
 
@@ -89,46 +49,38 @@ export function ManufacturerCapabilities() {
         </div>
       </div>
 
-      {/* Capabilities grid */}
-      <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-2 lg:grid-cols-4">
-        {capabilities.map((cap, i) => (
+      {/* Grid — 3 columns on desktop, 2 on tablet, 1 on mobile */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((cap) => (
           <div
-            key={cap.title}
-            className={`group relative bg-background overflow-hidden ${cap.span} ${
-              i === 0 ? "lg:row-span-2" : ""
-            }`}
+            key={cap.id}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-lg"
           >
             {/* Image */}
-            <div className={`relative overflow-hidden ${i === 0 ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
+            <div className="relative aspect-[16/9] overflow-hidden">
               <Image
-                src={cap.image}
+                src={cap.image_src}
                 alt={cap.title}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors duration-500" />
-
-              {/* Floating title over image */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                <h3 className="text-base font-semibold text-white">{cap.title}</h3>
-              </div>
+              <div className="absolute inset-0 bg-black/15 group-hover:bg-black/5 transition-colors duration-500" />
             </div>
 
-            {/* Text below image */}
-            <div className="p-6">
-              <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
-                {cap.description}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {cap.specs.map((spec) => (
-                  <span
-                    key={spec}
-                    className="border border-border px-2.5 py-1 text-xs text-muted-foreground"
-                  >
-                    {spec}
-                  </span>
-                ))}
-              </div>
+            {/* Content */}
+            <div className="flex flex-1 flex-col gap-3 p-6">
+              <h3 className="text-base font-semibold text-foreground">{cap.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground flex-1">{cap.description}</p>
+              {cap.specs.length > 0 && (
+                <ul className="mt-2 flex flex-col gap-1.5 border-t border-border pt-4">
+                  {cap.specs.map((spec) => (
+                    <li key={spec} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="h-1 w-1 shrink-0 rounded-full" style={{ backgroundColor: "#0B7380" }} />
+                      {spec}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         ))}
