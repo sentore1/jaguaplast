@@ -19,6 +19,7 @@ import type { NavLink } from "@/lib/types/cms";
 const searchItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "About Us", href: "/about", icon: Info },
+  { label: "Company Profile", href: "/company-profile", icon: Info },
   { label: "Solutions / Technology", href: "/technology", icon: Cpu },
   { label: "Products", href: "/products", icon: Package },
   { label: "Contact Us", href: "/contact", icon: Phone },
@@ -32,9 +33,10 @@ const searchItems = [
 const fallbackNavLinks = [
   { id: 1, label: "HOME", href: "/", sort_order: 1, active: true },
   { id: 2, label: "ABOUT", href: "/about", sort_order: 2, active: true },
-  { id: 3, label: "SOLUTIONS", href: "/technology", sort_order: 3, active: true },
-  { id: 4, label: "PRODUCTS", href: "/products", sort_order: 4, active: true },
-  { id: 5, label: "CONTACT US", href: "/contact", sort_order: 5, active: true },
+  { id: 3, label: "COMPANY PROFILE", href: "/company-profile", sort_order: 3, active: true },
+  { id: 4, label: "SOLUTIONS", href: "/technology", sort_order: 4, active: true },
+  { id: 5, label: "PRODUCTS", href: "/products", sort_order: 5, active: true },
+  { id: 6, label: "CONTACT US", href: "/contact", sort_order: 6, active: true },
 ];
 
 interface HeaderProps {
@@ -89,7 +91,7 @@ export function Header({ navLinks: navLinksProp }: HeaderProps) {
                 link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
               return (
                 <Link
-                  key={link.href}
+                  key={link.id}
                   href={link.href}
                   className={`text-[10px] font-semibold tracking-[0.15em] uppercase transition-colors ${
                     isActive
@@ -139,7 +141,7 @@ export function Header({ navLinks: navLinksProp }: HeaderProps) {
                   link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
                 return (
                   <Link
-                    key={link.href}
+                    key={link.id}
                     href={link.href}
                     className={`px-4 py-3 text-sm font-semibold tracking-widest uppercase transition-colors ${
                       isActive ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/10 hover:text-white"
